@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+  body {
+    font: 10px sans-serif;
+  }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  .x.axis path {
+    /*display: none;*/
+  }
+
+  .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 1.5px;
+  }
+
+  .line.exposed-user-count {
+    stroke: green;
+  }
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script>
+
+var superscript = "⁰¹²³⁴⁵⁶⁷⁸⁹",
+  formatPower = function(d) {
+    return (d + "").split("").map(function(c) {
+      return superscript[c];
+    }).join("");
+  };
+
+var margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width  = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.time.scale()
+    .range([0, width]);
+
+var y = d3.scale.log()
+    .base(Math.E)
+    .domain([Math.exp(0), Math.exp(20)])
+    .range([height, 0]);
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left")
+    .tickFormat(function(d) {
+      return "e" + formatPower(Math.round(Math.log(d)));
+    });
+
+var yAxis2 = d3.svg.axis()
+    .scale(y)
+    .orient("right")
+    .tickFormat(function(d) {
+      return "e" + formatPower(Math.round(Math.log(d)));
+    });
+
+var line = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) {
+      if (d.count > 0) {
+        return y(d.count);
+      } else {
+        return height;
+      }
+    });
+
+var line2 = d3.svg.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) {
+      if (d.exposed_user_count > 0) {
+        return y(d.exposed_user_count);
+      } else {
+        return height;
+      }
+    });
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width   + margin.left + margin.right)
+    .attr("height", height + margin.top  + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+d3.csv("retweet_count_at_time-536729769631842300.csv", function(error, data) {
+  data.forEach(function(d) {
+    d.date  = new Date(d.time);
+    d.count = +d.count;
+    d.exposed_user_count = +d.exposed_user_count;
+  });
+
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  // y.domain(d3.extent(data, function(d) { return d.count; }));
+
+  svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("count");
+
+  svg.append("g")
+      .attr("class", "y axis")
+      .attr("transform", "translate("+width+",0)")
+      .call(yAxis2)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", -6)
+      .attr("dy", "-.71em")
+      .style("text-anchor", "end")
+      .text("exposed user count");
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line")
+      .attr("d", line);
+
+  svg.append("path")
+      .datum(data)
+      .attr("class", "line exposed-user-count")
+      .attr("d", line2);
+});
+</script>

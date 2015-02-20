@@ -1,0 +1,36 @@
+template logentriesTemplate {
+  template("<%= key.logentries %> $ISODATE $HOST [DB] $MSG\n");
+  template_escape(no);
+};
+
+template logentriesTemplateErr {
+  template("<%= key.logentries %> $ISODATE $HOST [DB ERR] $MSG\n");
+  template_escape(no);
+};
+
+source s_app {
+  file("/var/log/postgres.log" follow_freq(1) flags(no-parse));
+};
+
+source s_app_err {
+  file("/var/log/postgres-err.log" follow_freq(1) flags(no-parse));
+};
+
+destination d_network_logentries {
+  tcp("api.logentries.com" port(10000) template(logentriesTemplate));
+};
+
+destination d_network_logentries_err {
+  tcp("api.logentries.com" port(10000) template(logentriesTemplateErr));
+};
+
+log {
+  source(s_app);
+  source(s_src);
+  destination(d_network_logentries);
+};
+
+log {
+  source(s_app_err);
+  destination(d_network_logentries_err);
+};

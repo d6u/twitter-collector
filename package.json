@@ -1,0 +1,36 @@
+{
+  "name": "twitter-collector",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app/app.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^0.9.0",
+    "config": "^1.11.0",
+    "knex": "^0.7.3",
+    "log4js": "^0.6.21",
+    "moment": "^2.8.3",
+    "pg": "^3.6.2",
+    "twit": "^1.1.18"
+  },
+  "devDependencies": {
+    "chai": "^1.9.2",
+    "gulp": "^3.8.8",
+    "gulp-clean": "^0.3.1",
+    "gulp-debug": "^1.0.1",
+    "gulp-ejs": "^0.3.1",
+    "gulp-filter": "^1.0.2",
+    "gulp-load-plugins": "^0.7.0",
+    "gulp-nodemon": "^1.0.4",
+    "gulp-rename": "^1.2.0",
+    "gulp-shell": "^0.2.10",
+    "heapdump": "^0.2.10",
+    "karma": "^0.12.24",
+    "lodash": "^3.3.0",
+    "merge-stream": "^0.1.6",
+    "mocha": "^2.0.1"
+  }
+}
